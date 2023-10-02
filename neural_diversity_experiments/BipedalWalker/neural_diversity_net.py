@@ -7,9 +7,7 @@ import copy
 
 class Neurons:
     def __init__(self, n_neurons):
-        """
-        A single layer of linear projection followed by the complex neuron activation function
-        """
+
         self.n_neurons = n_neurons
 
         self.neurons = np.zeros((n_neurons, ))
@@ -17,7 +15,7 @@ class Neurons:
         self.hidden = np.zeros((n_neurons, 1))
         self.params = np.random.uniform(-1, 1, (n_neurons, 3,3))
 
-    def neuron_fn(self, inputs, r):
+    def neuron_fn(self, inputs):
         """
         inputs: (n_neurons, )
         """
@@ -40,12 +38,7 @@ class Neurons:
 
 class NeuralDiverseNet:
     def __init__(self, sizes):
-        """
-        A fully connected network of ComplexLayer
 
-        sizes: [input_size, hid_1, ..., output_size]
-        add_identity_input_layer: bool, whether to add an input layer with an identity weight matrix
-        """
         neurons = [Neurons(size) for size in sizes[:-1]]
         neurons.append(Neurons(sizes[-1]))
         self.neurons = neurons
@@ -53,19 +46,19 @@ class NeuralDiverseNet:
         weights = [np.random.normal(0,.5, (sizes[i], sizes[i + 1])) for i in range(len(sizes) - 1)]
         self.weights = weights
 
-    def forward(self, x, r):
+    def forward(self, x):
         """
         x: (n_in, )
         """
         neurons = self.neurons
         weights = self.weights
 
-        pre, pre_dot = neurons[0].neuron_fn(x, r)
+        pre, pre_dot = neurons[0].neuron_fn(x)
 
         for i, neuron in enumerate(neurons[1:]):
             send = pre @ weights[i]
             
-            post, post_dot = neuron.neuron_fn(send, r)
+            post, post_dot = neuron.neuron_fn(send)
 
             pre = post
             pre_dot = post_dot
